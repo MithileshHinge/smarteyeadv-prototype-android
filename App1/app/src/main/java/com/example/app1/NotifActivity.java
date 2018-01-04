@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -38,7 +39,7 @@ public class NotifActivity extends AppCompatActivity {
     //public static ImageView jIVFrame;
     public static ImageView jIV;
     public static VideoView jVV;
-    private static int videoNotifID;
+    private int videoNotifID;
     public static Context context;
     public static String servername;
     private Toolbar toolbar;
@@ -84,10 +85,12 @@ public class NotifActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                final File videoStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyeVideos");
+                                Log.d("Video entered", "HAHAHAHHHHHHHHUUUUUUUUUUUUUUUUUUUEEEEEEEEEEEEEEEEE!");
+                                //########final File videoStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyeVideos");
                                 Socket socketVdo = new Socket(servername, 6668);
                                 OutputStream outVdo = socketVdo.getOutputStream();
                                 DataOutputStream doutVdo = new DataOutputStream(outVdo);
+                                System.out.println("VideoNotifId is: " + videoNotifID);
                                 doutVdo.writeInt(videoNotifID);
                                 doutVdo.flush();
 
@@ -102,11 +105,14 @@ public class NotifActivity extends AppCompatActivity {
                                 //Database._date = filename;
                                 outVdo.write(1);
                                 outVdo.flush();
-
+                                System.out.println("filename cha aadaan pradaan is done!");
+                                /*#############
                                 //FileOutputStream fileOut = openFileOutput(filename, MODE_PRIVATE);
                                 final String finalVideoFileName = videoStorageDir.getPath() + "/" + filename;
                                 System.out.println("*****************folder path = " + finalVideoFileName);
                                 FileOutputStream fileOut = new FileOutputStream(finalVideoFileName);
+                                */
+                                FileOutputStream fileOut = openFileOutput(filename, MODE_PRIVATE);   ///////newly added...delete it agar externalstorage used
 
                                 byte[] buffer = new byte[16 * 1024];
                                 int count;
@@ -127,9 +133,15 @@ public class NotifActivity extends AppCompatActivity {
                                     public void run() {
                                         Toast.makeText(context, "Download successful.", Toast.LENGTH_LONG).show();
                                         jIV.setVisibility(View.GONE);
-                                        String filepath = videoStorageDir.getAbsolutePath() + "/" + filename;
+                                       /*#### String filepath = videoStorageDir.getAbsolutePath() + "/" + filename;
                                         System.out.println("^^^^^^^^^^^^^^^^folder path = " + videoStorageDir.getAbsolutePath() + "/" + filename);
-                                        jVV.setVideoPath(finalVideoFileName);
+                                        jVV.setVideoPath(finalVideoFileName);*/
+                                        ////newly added block..delete if using external storage
+                                        String filepath = getFilesDir().getPath() + "/" + filename;
+                                        System.out.println("^^^^^^^^^^^^^^^^folder path = " + getFilesDir().getPath() + "/" + filename);
+                                        jVV.setVideoPath(filepath);
+                                        //block ends
+
                                         jVV.setVisibility(View.VISIBLE);
                                         jVV.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                             @Override
@@ -137,8 +149,9 @@ public class NotifActivity extends AppCompatActivity {
                                                 jVV.start();
                                             }
                                         });
-                                        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(videoStorageDir.getAbsolutePath() + "/" + "2017_08_13at08_29_47_PM.mp4", MediaStore.Video.Thumbnails.MICRO_KIND);
+                                        /* #####Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(videoStorageDir.getAbsolutePath() + "/" + "2017_08_13at08_29_47_PM.mp4", MediaStore.Video.Thumbnails.MICRO_KIND);
                                         ActivityFragment.jIB.setImageBitmap(thumbnail);
+                                        */
 
                                         //Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(filepath, MediaStore.Video.Thumbnails.MICRO_KIND);
                                         //ActivityFragment.jIB.setImageBitmap(thumbnail);

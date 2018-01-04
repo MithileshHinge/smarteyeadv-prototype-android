@@ -42,7 +42,7 @@ public class NotifyService extends Service {
 
     NotifyServiceReceiver notifyServiceReceiver;
 
-    private static int MY_NOTIFICATION_ID;
+    private int MY_NOTIFICATION_ID;
     public static int NotifByte;
     private static int MY_VIDEO_NOTIFICATION_ID;
 
@@ -85,14 +85,6 @@ public class NotifyService extends Service {
 
         Toast.makeText(this, "Notification service started", Toast.LENGTH_LONG).show();
 
-        final Intent firstNotifIntent = new Intent(context, NotifActivity.class);
-        final Intent secondNotifIntent = new Intent(getApplicationContext(), NotifActivity.class);
-
-        final TaskStackBuilder firstStackBuilder = TaskStackBuilder.create(context);
-        firstStackBuilder.addParentStack(NotifActivity.class);
-        final TaskStackBuilder secondStackBuilder = TaskStackBuilder.create(context);
-        secondStackBuilder.addParentStack(NotifActivity.class);
-
 
 
         final Handler handler = new Handler();
@@ -114,6 +106,12 @@ public class NotifyService extends Service {
                         out.write(1);
                         out.flush();
                         System.out.println("NOTIF  RECIEVED: "+ String.valueOf(p));
+
+                        Intent firstNotifIntent = new Intent(context, NotifActivity.class);
+                        Intent secondNotifIntent = new Intent(context, NotifActivity.class);
+
+                        firstNotifIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        secondNotifIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                         if(p==BYTE_ALERT1)
                         {
@@ -137,6 +135,7 @@ public class NotifyService extends Service {
                         if (p == BYTE_PEOPLE_VDOGENERATING || p == BYTE_PEOPLE_VDOGENERATED){
                             nPersons = in.read();
                             nFaces = in.read();
+
                             out.write(1);
                             out.flush();
 
@@ -166,9 +165,9 @@ public class NotifyService extends Service {
                             saveImage(context, notifFrame, imageName);
 
                             firstNotifIntent.putExtra("image_name", imageName);
-                            firstStackBuilder.addNextIntent(firstNotifIntent);
 
-                            PendingIntent firstPendingIntent = firstStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                            int requestID = (int) System.currentTimeMillis();
+                            PendingIntent firstPendingIntent = PendingIntent.getActivity(context, requestID, firstNotifIntent, 0);
                             notifBuilder.setContentIntent(firstPendingIntent);
 
                             NotificationCompat.BigPictureStyle bps = new NotificationCompat.BigPictureStyle().bigPicture(notifFrame);
@@ -185,29 +184,33 @@ public class NotifyService extends Service {
                             }
                         }
                         if(p== BYTE_PEOPLE_VDOGENERATED || p ==BYTE_ALERT2 || p == BYTE_ABRUPT_END){
-                            //DataInputStream dataInputStream = new DataInputStream(in);
-                            //Database._date = dataInputStream.readUTF();
-                            //System.out.println(Database._date);
-                            //ActivityFragment.db .addContact(new Database(Database._name,Database._date));
+                            DataInputStream dataInputStream = new DataInputStream(in);
+                            Database._date = dataInputStream.readUTF();
+                            System.out.println(Database._date);
+                            ActivityFragment.db .addContact(new Database(Database._name,Database._date));
 
                         }
                         DataInputStream din = new DataInputStream(in);
                         MY_NOTIFICATION_ID = din.readInt();
+                        System.out.println("My notification Id received is:"+MY_NOTIFICATION_ID);
                         out.write(9);
                         out.flush();
+                        din.close();
                         client.close();
 
                         if(p == BYTE_PEOPLE_VDOGENERATING || p == BYTE_ALERT1)
                         {
                             notificationManager.notify(MY_NOTIFICATION_ID, notifBuilder.build());
+
                         }
 
                         if (p == BYTE_PEOPLE_VDOGENERATED || p == BYTE_ALERT2 || p == BYTE_ABRUPT_END) {
+                            System.out.println("My notification Id received is:"+MY_NOTIFICATION_ID);
 
                             secondNotifIntent.putExtra("video_notif_id", MY_NOTIFICATION_ID);
-                            secondStackBuilder.addNextIntent(secondNotifIntent);
 
-                            PendingIntent secondPendingIntent = secondStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                            int requestID = (int) System.currentTimeMillis();
+                            PendingIntent secondPendingIntent = PendingIntent.getActivity(context, requestID, secondNotifIntent, 0);
                             notifVdoBuilder.setContentIntent(secondPendingIntent);
 
                             notificationManager.notify(MY_NOTIFICATION_ID, notifVdoBuilder.build());
