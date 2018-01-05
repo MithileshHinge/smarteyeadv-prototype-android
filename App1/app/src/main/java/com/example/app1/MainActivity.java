@@ -1,7 +1,6 @@
 package com.example.app1;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -47,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActivityFragment activityFragment = new ActivityFragment();
+        ActivityLogFragment activityLogFragment = new ActivityLogFragment();
         android.support.v4.app.FragmentTransaction activityFragmentTransaction = getSupportFragmentManager().beginTransaction();
-        activityFragmentTransaction.replace(R.id.frame, activityFragment);
+        activityFragmentTransaction.replace(R.id.frame, activityLogFragment);
         activityFragmentTransaction.commit();
 
         spref_mode = PreferenceManager.getDefaultSharedPreferences(this);
@@ -138,9 +137,9 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.activity:
                         Toast.makeText(getApplicationContext(), "Activity Timeline", Toast.LENGTH_SHORT).show();
-                        ActivityFragment activityFragment = new ActivityFragment();
+                        ActivityLogFragment activityLogFragment = new ActivityLogFragment();
                         android.support.v4.app.FragmentTransaction activityFragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        activityFragmentTransaction.replace(R.id.frame, activityFragment,"ACTIVITY");
+                        activityFragmentTransaction.replace(R.id.frame, activityLogFragment,"ACTIVITY");
                         activityFragmentTransaction.commit();
                         return true;
                     case R.id.settings:
@@ -268,8 +267,8 @@ public class MainActivity extends AppCompatActivity {
         Fragment current = fragmentManager.findFragmentByTag("ACTIVITY");
         if(current == null){
             android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            ActivityFragment activityFragment= new ActivityFragment();
-            fragmentTransaction.replace(R.id.frame,activityFragment);
+            ActivityLogFragment activityLogFragment = new ActivityLogFragment();
+            fragmentTransaction.replace(R.id.frame, activityLogFragment);
             fragmentTransaction.commit();
         }else{
             super.onBackPressed();

@@ -15,10 +15,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.DataInputStream;
@@ -96,14 +94,18 @@ public class NotifyService extends Service {
         t = new Thread(new Runnable() {
             @Override
             public void run() {
+                String imageName = null;
+
                 while(true) {
                     int nPersons = 0, nFaces = 0;
+
+                    String _name = null;
 
                     try {
                         spref_ip = PreferenceManager.getDefaultSharedPreferences(context);
                         servername = spref_ip.getString("ip_address","");
                         Socket client = new Socket(servername, 6667);
-                        System.out.println("CONNECTED "+"to " + servername);
+                        System.out.println("CONNECTED " + "to " + servername);
                         InputStream in = client.getInputStream();
                         OutputStream out = client.getOutputStream();
                         int p = in.read();
@@ -123,17 +125,17 @@ public class NotifyService extends Service {
                         }
                         if(p == BYTE_PEOPLE_VDOGENERATED)
                         {
-                            Database._name = "Face Found.";
+                            _name = "Face Found.";
 
 
                         }
                         if(p == BYTE_ALERT2)
                         {
                             notifVdoBuilder.setContentTitle("Suspicious activity. Video generated");
-                            Database._name = "Suspicious activity.Alert level 2";
+                            _name = "Suspicious activity.Alert level 2";
                         }
                         if( p == BYTE_ABRUPT_END){
-                            Database._name = "Abrupt end of activity.";
+                            _name = "Abrupt end of activity.";
                         }
 
                         if (p == BYTE_PEOPLE_VDOGENERATING || p == BYTE_PEOPLE_VDOGENERATED){
@@ -145,13 +147,13 @@ public class NotifyService extends Service {
 
                             if (nPersons <= nFaces){
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
-                                    notifBuilder.setContentTitle(nPersons + "Someone is on your doorstep.");
+                                    notifBuilder.setContentTitle("Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
                                     notifVdoBuilder.setContentTitle(nPersons + " people on your doorstep.");
                                 }
                             }else {
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
-                                    notifBuilder.setContentTitle(nPersons + "Someone is on your doorstep.");
+                                    notifBuilder.setContentTitle("Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
                                     notifVdoBuilder.setContentTitle(nPersons + " people with " + (nPersons - nFaces) + " faces covered on your doorstep.");
                                 }
@@ -165,7 +167,7 @@ public class NotifyService extends Service {
                             final Bitmap notifFrame = BitmapFactory.decodeStream(new FlushedInputStream(inFrame));
                             socketFrame.close();
 
-                            String imageName = getCurrentTimeStamp();
+                            imageName = getCurrentTimeStamp();
                             saveImage(context, notifFrame, imageName);
 
                             firstNotifIntent.putExtra("image_name", imageName);
@@ -189,9 +191,8 @@ public class NotifyService extends Service {
                         }
                         if(p== BYTE_PEOPLE_VDOGENERATED || p ==BYTE_ALERT2 || p == BYTE_ABRUPT_END){
                             DataInputStream dataInputStream = new DataInputStream(in);
-                            Database._date = dataInputStream.readUTF();
-                            System.out.println(Database._date);
-                            db.addContact(new Database(Database._name, Database._date));
+                            String _date = dataInputStream.readUTF();
+                            db.addRow(new DatabaseRow(_name, _date, 0, imageName));
 
                         }
                         DataInputStream din = new DataInputStream(in);
@@ -223,9 +224,9 @@ public class NotifyService extends Service {
                         }
                         if(p == 6){
                             notificationManager.notify(MY_NOTIFICATION_ID,lightBuilder.build());
-                            Database._name = lightTitle;
-                            String datenow = Database.dateFormat.format(Database.date);
-                            db.addContact(new Database(Database._name,datenow));
+                            _name = lightTitle;
+                            String datenow = DatabaseRow.dateFormat.format(new Date());
+                            db.addRow(new DatabaseRow(_name, datenow, 0, null));
                         }
 
 
