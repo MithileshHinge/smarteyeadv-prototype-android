@@ -102,7 +102,7 @@ public class NotifActivity extends AppCompatActivity {
                                 outVdo.flush();
                                 inVdo.read(filenameInBytes);
                                 filename = new String(filenameInBytes);
-                                //Database._date = filename;
+                                //DatabaseRow._date = filename;
                                 outVdo.write(1);
                                 outVdo.flush();
                                 System.out.println("filename cha aadaan pradaan is done!");
@@ -150,11 +150,11 @@ public class NotifActivity extends AppCompatActivity {
                                             }
                                         });
                                         /* #####Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(videoStorageDir.getAbsolutePath() + "/" + "2017_08_13at08_29_47_PM.mp4", MediaStore.Video.Thumbnails.MICRO_KIND);
-                                        ActivityFragment.jIB.setImageBitmap(thumbnail);
+                                        ActivityLogFragment.jIB.setImageBitmap(thumbnail);
                                         */
 
                                         //Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(filepath, MediaStore.Video.Thumbnails.MICRO_KIND);
-                                        //ActivityFragment.jIB.setImageBitmap(thumbnail);
+                                        //ActivityLogFragment.jIB.setImageBitmap(thumbnail);
                                     }
                                 });
                             } catch (IOException e) {
@@ -190,6 +190,7 @@ public class NotifActivity extends AppCompatActivity {
         }
         return null;
     }
+
     @Override
     public void onBackPressed(){
         Intent intent = new Intent(NotifActivity.this,MainActivity.class);
