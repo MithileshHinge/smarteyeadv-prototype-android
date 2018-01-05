@@ -51,9 +51,13 @@ public class NotifyService extends Service {
 
     private static Thread t;
     private static SharedPreferences spref_ip;
+
+    public static DatabaseHandler db;
+
     @Override
     public void onCreate() {
         notifyServiceReceiver = new NotifyServiceReceiver();
+        db = new DatabaseHandler(getApplicationContext());
         super.onCreate();
     }
 
@@ -141,13 +145,13 @@ public class NotifyService extends Service {
 
                             if (nPersons <= nFaces){
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
-                                    notifBuilder.setContentTitle(nPersons + " people on your doorstep.");
+                                    notifBuilder.setContentTitle(nPersons + "Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
                                     notifVdoBuilder.setContentTitle(nPersons + " people on your doorstep.");
                                 }
                             }else {
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
-                                    notifBuilder.setContentTitle(nPersons + " people with " + (nPersons - nFaces) + " faces covered on your doorstep.");
+                                    notifBuilder.setContentTitle(nPersons + "Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
                                     notifVdoBuilder.setContentTitle(nPersons + " people with " + (nPersons - nFaces) + " faces covered on your doorstep.");
                                 }
@@ -187,7 +191,7 @@ public class NotifyService extends Service {
                             DataInputStream dataInputStream = new DataInputStream(in);
                             Database._date = dataInputStream.readUTF();
                             System.out.println(Database._date);
-                            ActivityFragment.db .addContact(new Database(Database._name,Database._date));
+                            db.addContact(new Database(Database._name, Database._date));
 
                         }
                         DataInputStream din = new DataInputStream(in);
@@ -205,7 +209,7 @@ public class NotifyService extends Service {
                         }
 
                         if (p == BYTE_PEOPLE_VDOGENERATED || p == BYTE_ALERT2 || p == BYTE_ABRUPT_END) {
-                            System.out.println("My notification Id received is:"+MY_NOTIFICATION_ID);
+                            System.out.println("My notification Id received is:" + MY_NOTIFICATION_ID);
 
                             secondNotifIntent.putExtra("video_notif_id", MY_NOTIFICATION_ID);
 
@@ -221,7 +225,7 @@ public class NotifyService extends Service {
                             notificationManager.notify(MY_NOTIFICATION_ID,lightBuilder.build());
                             Database._name = lightTitle;
                             String datenow = Database.dateFormat.format(Database.date);
-                            ActivityFragment.db .addContact(new Database(Database._name,datenow));
+                            db.addContact(new Database(Database._name,datenow));
                         }
 
 

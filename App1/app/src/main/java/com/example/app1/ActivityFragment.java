@@ -32,7 +32,7 @@ public class ActivityFragment extends Fragment {
     private ListView listv;
     public static ArrayList<String> ArrayofName = new ArrayList<String>();
     public static String datenow;
-    public static DatabaseHandler db;
+
     public static ImageView jIB;
 
 
@@ -44,7 +44,7 @@ public class ActivityFragment extends Fragment {
 
         jIB = (ImageView) v.findViewById(R.id.imageButton);
 
-        db = new DatabaseHandler(getActivity());
+        NotifyService.db = new DatabaseHandler(getActivity());
         ArrayofName.clear();
         /**
          * CRUD Operations
@@ -59,7 +59,7 @@ public class ActivityFragment extends Fragment {
 
         // Reading all contacts
         Log.d("Reading: ", "Reading all contacts..");
-        List<Database> contacts = db.getAllContacts();
+        List<Database> contacts = NotifyService.db.getAllContacts();
 
         for (Database cn : contacts) {
             String log = "Id: " + cn.getID() + " ,Name: " + cn.getName() + " ,Date: " + datenow;

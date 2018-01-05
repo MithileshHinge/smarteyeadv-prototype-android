@@ -56,7 +56,7 @@ public class NotifActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.parseColor("#F7E7CE"));
 
-        spref_ip = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
+        spref_ip = PreferenceManager.getDefaultSharedPreferences(context);
         servername = spref_ip.getString("ip_address","");
         System.out.println("........................servername  " + servername);
 
