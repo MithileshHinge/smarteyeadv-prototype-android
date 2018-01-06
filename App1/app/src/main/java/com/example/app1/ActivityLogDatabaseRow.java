@@ -7,7 +7,7 @@ import java.util.Locale;
 /**
  * Created by Sibhali on 7/30/2017.
  */
-public class DatabaseRow {
+public class ActivityLogDatabaseRow {
 
     int _id;
     String _name;
@@ -18,11 +18,11 @@ public class DatabaseRow {
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     // Empty constructor
-    public DatabaseRow(){
+    public ActivityLogDatabaseRow(){
 
     }
     // constructor
-    public DatabaseRow(int id, String name, String date, int isBookmarked, String thumbpath){
+    public ActivityLogDatabaseRow(int id, String name, String date, int isBookmarked, String thumbpath){
         this._id = id;
         this._name = name;
         this._date = date;
@@ -31,12 +31,13 @@ public class DatabaseRow {
     }
 
     // constructor
-    public DatabaseRow(String name, String _date, int isBookmarked, String thumbpath){
+    public ActivityLogDatabaseRow(String name, String _date, int isBookmarked, String thumbpath){
         this._name = name;
         this._date= _date;
         this._isBookmarked = isBookmarked;
         this._thumbpath = thumbpath;
     }
+
     // getting ID
     public int getID(){
         return this._id;

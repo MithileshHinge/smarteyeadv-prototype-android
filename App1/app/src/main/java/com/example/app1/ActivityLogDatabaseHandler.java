@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseHandler extends SQLiteOpenHelper {
+public class ActivityLogDatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
@@ -32,7 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
 
-    public DatabaseHandler(Context context) {
+    public ActivityLogDatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -66,7 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
 
     // Adding new row
-    void addRow(DatabaseRow rowEntry) {
+    void addRow(ActivityLogDatabaseRow rowEntry) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -81,14 +81,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Getting single row
-    DatabaseRow getRow(int id) {
+    ActivityLogDatabaseRow getRow(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_ACTIVITY_LOG, new String[]{KEY_ID, KEY_NAME, KEY_DATE, KEY_BKMRK, KEY_THUMBPATH}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
-        DatabaseRow rowEntry = new DatabaseRow(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getString(4));
+        ActivityLogDatabaseRow rowEntry = new ActivityLogDatabaseRow(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getString(4));
         cursor.close();
 
         // return row
@@ -96,8 +96,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Getting All Rows
-    public List<DatabaseRow> getAllRows() {
-        List<DatabaseRow> rows = new ArrayList<DatabaseRow>();
+    public List<ActivityLogDatabaseRow> getAllRows() {
+        List<ActivityLogDatabaseRow> rows = new ArrayList<ActivityLogDatabaseRow>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_LOG;
 
@@ -107,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                DatabaseRow rowEntry = new DatabaseRow();
+                ActivityLogDatabaseRow rowEntry = new ActivityLogDatabaseRow();
                 rowEntry.setID(Integer.parseInt(cursor.getString(0)));
                 rowEntry.setName(cursor.getString(1));
                 rowEntry.setDateTime(cursor.getString(2));
@@ -124,7 +124,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Updating single row
-    public int updateRow(DatabaseRow rowEntry) {
+    public int updateRow(ActivityLogDatabaseRow rowEntry) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -138,7 +138,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single row
-    public void deleteRow(DatabaseRow rowEntry) {
+    public void deleteRow(ActivityLogDatabaseRow rowEntry) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_ACTIVITY_LOG, KEY_ID + " = ?", new String[]{String.valueOf(rowEntry.getID())});
         db.close();

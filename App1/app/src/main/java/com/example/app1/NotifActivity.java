@@ -102,7 +102,7 @@ public class NotifActivity extends AppCompatActivity {
                                 outVdo.flush();
                                 inVdo.read(filenameInBytes);
                                 filename = new String(filenameInBytes);
-                                //DatabaseRow._date = filename;
+                                //ActivityLogDatabaseRow._date = filename;
                                 outVdo.write(1);
                                 outVdo.flush();
                                 System.out.println("filename cha aadaan pradaan is done!");

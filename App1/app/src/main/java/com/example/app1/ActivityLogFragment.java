@@ -23,17 +23,17 @@ public class ActivityLogFragment extends Fragment {
     public static String datenow;
 
     List<String> listDataHeaders;
-    HashMap<String, List<DatabaseRow>> listDataChild;
+    HashMap<String, List<ActivityLogDatabaseRow>> listDataChild;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activitylog_fragment, container, false);
         getActivity().setTitle("Activity");
 
-        NotifyService.db = new DatabaseHandler(getActivity());
+        NotifyService.db = new ActivityLogDatabaseHandler(getActivity());
 
-        datenow = DatabaseRow.dateFormat.format(new Date());
-        //db.addRow(new DatabaseRow("Ravi", datenow, 0));
+        datenow = ActivityLogDatabaseRow.dateFormat.format(new Date());
+        //db.addRow(new ActivityLogDatabaseRow("Ravi", datenow, 0));
 
 
         expandableListView= (ExpandableListView) v.findViewById(R.id.listView1);
@@ -42,7 +42,7 @@ public class ActivityLogFragment extends Fragment {
         listDataHeaders = new ArrayList<>();
         listDataChild = new HashMap<>();
 
-        List<DatabaseRow> databaseItems = NotifyService.db.getAllRows(); // get all items from db TODO: later optimize this to only load 20 items
+        List<ActivityLogDatabaseRow> databaseItems = NotifyService.db.getAllRows(); // get all items from db TODO: later optimize this to only load 20 items
 
         Log.e("Database size", String.valueOf(databaseItems.size()));
 
@@ -52,11 +52,11 @@ public class ActivityLogFragment extends Fragment {
         for (int i=databaseItems.size() - 1; i>=0; i--){
             //sort all items into different ArrayLists a/c to date
 
-            DatabaseRow row = databaseItems.get(i);
+            ActivityLogDatabaseRow row = databaseItems.get(i);
             String datetime = row.getDateTime();
             String date = datetime.substring(8,10) + " " + months[Integer.parseInt(datetime.substring(5,7)) - 1];
 
-            List<DatabaseRow> tempItem;
+            List<ActivityLogDatabaseRow> tempItem;
             if (listDataChild.containsKey(date)){
                 tempItem = listDataChild.get(date);
             }else {
@@ -74,21 +74,21 @@ public class ActivityLogFragment extends Fragment {
         listDataHeaders.add("24 October");
         listDataHeaders.add("23 October");
 
-        List<DatabaseRow> oct23 = new ArrayList<>();
-        oct23.add(new DatabaseRow("Suspicious Activity", "2017-10-23 19:50:12", 0));
-        oct23.add(new DatabaseRow("Suspicious Activity", "2017-10-23 20:50:12", 0));
-        oct23.add(new DatabaseRow("Face Found", "2017-10-23 21:50:12", 0));
-        oct23.add(new DatabaseRow("Face Found", "2017-10-23 22:50:12", 0));
+        List<ActivityLogDatabaseRow> oct23 = new ArrayList<>();
+        oct23.add(new ActivityLogDatabaseRow("Suspicious Activity", "2017-10-23 19:50:12", 0));
+        oct23.add(new ActivityLogDatabaseRow("Suspicious Activity", "2017-10-23 20:50:12", 0));
+        oct23.add(new ActivityLogDatabaseRow("Face Found", "2017-10-23 21:50:12", 0));
+        oct23.add(new ActivityLogDatabaseRow("Face Found", "2017-10-23 22:50:12", 0));
 
-        List<DatabaseRow> oct24 = new ArrayList<>();
-        oct24.add(new DatabaseRow("Face Found", "2017-10-24 09:50:12", 0));
-        oct24.add(new DatabaseRow("Face Found", "2017-10-24 10:50:12", 0));
-        oct24.add(new DatabaseRow("Face Found", "2017-10-24 15:50:12", 0));
+        List<ActivityLogDatabaseRow> oct24 = new ArrayList<>();
+        oct24.add(new ActivityLogDatabaseRow("Face Found", "2017-10-24 09:50:12", 0));
+        oct24.add(new ActivityLogDatabaseRow("Face Found", "2017-10-24 10:50:12", 0));
+        oct24.add(new ActivityLogDatabaseRow("Face Found", "2017-10-24 15:50:12", 0));
 
-        List<DatabaseRow> oct25 = new ArrayList<>();
-        oct25.add(new DatabaseRow("Face Found", "2017-10-25 11:50:12", 0));
-        oct25.add(new DatabaseRow("Suspicious Activity", "2017-10-25 12:50:12", 0));
-        oct25.add(new DatabaseRow("Abrupt End", "2017-10-25 13:50:12", 0));
+        List<ActivityLogDatabaseRow> oct25 = new ArrayList<>();
+        oct25.add(new ActivityLogDatabaseRow("Face Found", "2017-10-25 11:50:12", 0));
+        oct25.add(new ActivityLogDatabaseRow("Suspicious Activity", "2017-10-25 12:50:12", 0));
+        oct25.add(new ActivityLogDatabaseRow("Abrupt End", "2017-10-25 13:50:12", 0));
 
         listDataChild.put(listDataHeaders.get(0), oct23);
         listDataChild.put(listDataHeaders.get(1), oct24);
@@ -102,7 +102,7 @@ public class ActivityLogFragment extends Fragment {
         /*
         expandableListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                //db.addRow(new DatabaseRow("ISHA" , datenow));
+                //db.addRow(new ActivityLogDatabaseRow("ISHA" , datenow));
                 //Toast.makeText(getApplicationContext(), ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
             }
         });

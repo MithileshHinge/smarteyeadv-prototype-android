@@ -25,9 +25,9 @@ public class ActivityLogCustomAdapter extends BaseExpandableListAdapter{
     private Context _context;
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
-    private HashMap<String, List<DatabaseRow>> _listDataChild;
+    private HashMap<String, List<ActivityLogDatabaseRow>> _listDataChild;
 
-    public ActivityLogCustomAdapter(Context context, List<String> listDataHeader, HashMap<String, List<DatabaseRow>> listDataChild) {
+    public ActivityLogCustomAdapter(Context context, List<String> listDataHeader, HashMap<String, List<ActivityLogDatabaseRow>> listDataChild) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listDataChild;
@@ -85,7 +85,7 @@ public class ActivityLogCustomAdapter extends BaseExpandableListAdapter{
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final DatabaseRow childDataItem = (DatabaseRow) getChild(groupPosition, childPosition);
+        final ActivityLogDatabaseRow childDataItem = (ActivityLogDatabaseRow) getChild(groupPosition, childPosition);
 
         if (convertView == null){
             LayoutInflater inflater = (LayoutInflater) this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

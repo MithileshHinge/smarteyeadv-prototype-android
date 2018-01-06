@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Home on 10-07-2017.
@@ -21,27 +22,44 @@ import java.util.ArrayList;
 public class ImageFragment extends Fragment {
     @Nullable
     private Context context;
-    public static ArrayList<ImageModel> data = new ArrayList<>();
-    //public static ArrayList<boolean> bkmrk_status_array = new ArrayList<>();
-    File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
-
+    public static List<BookmarkedDatabaseRow> data = new ArrayList<>();
+    public static List<File> checkEntry = new ArrayList<>();
+    public static File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.image_fragment,container,false);
 
-
         getActivity().setTitle("Pictures");
         context = getContext();
         try {
-            data.clear();
             for (File fileEntry : imageStorageDir.listFiles()) {
-                ImageModel imageModel = new ImageModel();
-                imageModel.setName(fileEntry.getName());
-                imageModel.setUrl(fileEntry.getPath());
-                imageModel.setBkmrk(false);
-                String extnsn = (fileEntry.getName()).split("\\.")[1];
-                if(extnsn.equals("jpg"))
-                    data.add(imageModel);
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                System.out.println(fileEntry);
+                System.out.println(fileEntry.getPath());
+                if(checkEntry.contains(fileEntry)) {
+                    System.out.println("continued");
+                    continue;
+                }
+
+                String extension = (fileEntry.getName()).split("\\.")[1];
+                checkEntry.add(fileEntry);
+                if(extension.equals("jpg")){
+                    BookmarkedDatabaseRow bookmarkedDatabaseRow  = MainActivity.bookmarkedDatabaseHandler.getRowFromUrl(fileEntry.getPath());
+
+                    if (bookmarkedDatabaseRow == null){
+                        bookmarkedDatabaseRow = new BookmarkedDatabaseRow();
+                        bookmarkedDatabaseRow.setUrl(fileEntry.getPath());
+                        bookmarkedDatabaseRow.setBkmrk(false);
+                        MainActivity.bookmarkedDatabaseHandler.addRow(bookmarkedDatabaseRow);
+                        bookmarkedDatabaseRow = MainActivity.bookmarkedDatabaseHandler.getRowFromUrl(fileEntry.getPath());
+                    }
+
+                    data.add(bookmarkedDatabaseRow);
+
+                    if (bookmarkedDatabaseRow.getBkmrk()){
+                        ImageGalleryAdapter.bkmrkImages.add(bookmarkedDatabaseRow);
+                    }
+                }
             }
         } catch (NullPointerException n) {
             System.out.println("Picture directory empty");
@@ -53,14 +71,11 @@ public class ImageFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         ImageGalleryAdapter adapter = new ImageGalleryAdapter(context, data);
+        adapter.classSelector = 1;
         adapter.imageRecyclerView = recyclerView;
         recyclerView.setAdapter(adapter);
-
+        System.out.println("............................!!!!!!!!!!!!!!!!!!!!!!!!!........................");
 
         return v;
-
     }
-
-
-
 }

@@ -50,12 +50,12 @@ public class NotifyService extends Service {
     private static Thread t;
     private static SharedPreferences spref_ip;
 
-    public static DatabaseHandler db;
+    public static ActivityLogDatabaseHandler db;
 
     @Override
     public void onCreate() {
         notifyServiceReceiver = new NotifyServiceReceiver();
-        db = new DatabaseHandler(getApplicationContext());
+        db = new ActivityLogDatabaseHandler(getApplicationContext());
         super.onCreate();
     }
 
@@ -192,7 +192,7 @@ public class NotifyService extends Service {
                         if(p== BYTE_PEOPLE_VDOGENERATED || p ==BYTE_ALERT2 || p == BYTE_ABRUPT_END){
                             DataInputStream dataInputStream = new DataInputStream(in);
                             String _date = dataInputStream.readUTF();
-                            db.addRow(new DatabaseRow(_name, _date, 0, imageName));
+                            db.addRow(new ActivityLogDatabaseRow(_name, _date, 0, imageName));
 
                         }
                         DataInputStream din = new DataInputStream(in);
@@ -225,8 +225,8 @@ public class NotifyService extends Service {
                         if(p == 6){
                             notificationManager.notify(MY_NOTIFICATION_ID,lightBuilder.build());
                             _name = lightTitle;
-                            String datenow = DatabaseRow.dateFormat.format(new Date());
-                            db.addRow(new DatabaseRow(_name, datenow, 0, null));
+                            String datenow = ActivityLogDatabaseRow.dateFormat.format(new Date());
+                            db.addRow(new ActivityLogDatabaseRow(_name, datenow, 0, null));
                         }
 
 

@@ -30,7 +30,7 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity {
 
     //Defining Variables
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     /**
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView mode,username;
     public static Context context;
     public static SharedPreferences spref_mode,spref_user;
+    public static BookmarkedDatabaseHandler bookmarkedDatabaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         spref_user = PreferenceManager.getDefaultSharedPreferences(this);
 
         context = getApplicationContext();
+
+        bookmarkedDatabaseHandler = new BookmarkedDatabaseHandler(context);
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
