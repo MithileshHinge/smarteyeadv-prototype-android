@@ -25,6 +25,7 @@ public class Client extends Thread {
     //private InputStream in;
     //private OutputStream out;
     private static SharedPreferences spref_ip;
+    private static Client t2;
     Client() {
 
     }
@@ -36,6 +37,7 @@ public class Client extends Thread {
             spref_ip = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
             serverName = spref_ip.getString("ip_address","");
             socket = new Socket(serverName, port);
+            OutputStream out = socket.getOutputStream();
 
             while (true) {
                 /*socket = new Socket(serverName, port);
@@ -53,6 +55,7 @@ public class Client extends Thread {
                 LivefeedFragment.frameChanged = true;
                 //socket.close();
                 udpSocket.close();
+                out.write(1);
                 if (!livefeed) {
                     socket.close();
                     System.out.println("CLIENT BANDA JHALA");
@@ -64,8 +67,13 @@ public class Client extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
             try {
-                if(socket!=null)
+                if(socket!=null){
                     socket.close();
+                    System.out.println("closing socket in exception");
+                }
+
+                t2 = new Client();                                 //load aaya toh check karna ki ye thread shuru karne se pehle thread.sleep ki need hai kya?
+                t2.start();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

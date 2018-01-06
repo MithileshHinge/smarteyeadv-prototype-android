@@ -78,6 +78,9 @@ public class LivefeedFragment extends Fragment {
 
         t = new Client();
         t.start();
+
+
+
         final Handler handler = new Handler();
 
         Thread t2 = new Thread(new Runnable() {

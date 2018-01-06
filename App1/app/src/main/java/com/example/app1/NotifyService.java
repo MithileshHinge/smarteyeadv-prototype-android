@@ -143,6 +143,7 @@ public class NotifyService extends Service {
                             out.write(1);
                             out.flush();
 
+
                             if (nPersons <= nFaces){
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
                                     notifBuilder.setContentTitle(nPersons + "Someone is on your doorstep.");
@@ -164,7 +165,7 @@ public class NotifyService extends Service {
                             InputStream inFrame = socketFrame.getInputStream();
                             final Bitmap notifFrame = BitmapFactory.decodeStream(new FlushedInputStream(inFrame));
                             socketFrame.close();
-
+                            System.out.println("............FRAME SOCKET closed!!!!!!!!!!");
                             String imageName = getCurrentTimeStamp();
                             saveImage(context, notifFrame, imageName);
 
@@ -195,6 +196,7 @@ public class NotifyService extends Service {
 
                         }
                         DataInputStream din = new DataInputStream(in);
+
                         MY_NOTIFICATION_ID = din.readInt();
                         System.out.println("My notification Id received is:"+MY_NOTIFICATION_ID);
                         out.write(9);
@@ -233,6 +235,8 @@ public class NotifyService extends Service {
                         e.printStackTrace();
 
                     }
+
+
                 }
             }
         });
