@@ -8,6 +8,7 @@ public class BookmarkedDatabaseRow {
     String _url;
     int _bkmrk;
     int _id;
+    boolean _checkedStatus;
 
     public BookmarkedDatabaseRow(){
 
@@ -17,11 +18,13 @@ public class BookmarkedDatabaseRow {
         _id = id;
         _url = url;
         _bkmrk = bkrmrk;
+
     }
 
-    public BookmarkedDatabaseRow(String url, int bkmrk){
+    public BookmarkedDatabaseRow(String url, int bkmrk, boolean checkedStatus){
         _url = url;
         _bkmrk = bkmrk;
+        _checkedStatus = checkedStatus;
     }
 
     public int getID(){
@@ -51,5 +54,10 @@ public class BookmarkedDatabaseRow {
     public void setBkmrk(int bkmrk){
         _bkmrk = bkmrk;
     }
+
+    public Boolean getStatus()  { return _checkedStatus; }
+
+    public void setStatus(Boolean checkedStatus) {this._checkedStatus = checkedStatus; }
+
 
 }

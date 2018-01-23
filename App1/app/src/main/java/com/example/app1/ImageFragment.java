@@ -50,6 +50,7 @@ public class ImageFragment extends Fragment {
                         bookmarkedDatabaseRow = new BookmarkedDatabaseRow();
                         bookmarkedDatabaseRow.setUrl(fileEntry.getPath());
                         bookmarkedDatabaseRow.setBkmrk(false);
+                        bookmarkedDatabaseRow.setStatus(false);
                         MainActivity.bookmarkedDatabaseHandler.addRow(bookmarkedDatabaseRow);
                         bookmarkedDatabaseRow = MainActivity.bookmarkedDatabaseHandler.getRowFromUrl(fileEntry.getPath());
                     }
