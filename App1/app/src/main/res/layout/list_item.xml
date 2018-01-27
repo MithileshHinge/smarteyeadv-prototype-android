@@ -20,6 +20,7 @@
         android:textOn=""
         android:textOff=""
         android:layout_alignBottom="@+id/item_img"
-        android:layout_alignRight="@+id/item_img"/>
+        android:layout_alignRight="@+id/item_img"
+        android:visibility="gone"/>
     
 </RelativeLayout>

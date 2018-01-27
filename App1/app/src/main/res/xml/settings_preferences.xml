@@ -49,21 +49,23 @@
             android:title="Username"
             android:summary="Set username "
             android:dialogMessage="Dialog Message"
-            android:defaultValue="Default value" />
+            android:defaultValue=""
+            android:enabled="false"/>
 
-        <android.support.v7.preference.EditTextPreference
+        <!--android.support.v7.preference.EditTextPreference
             android:key="keyy2"
             android:title="Password"
             android:summary="Set password"
             android:dialogMessage="Dialog Message"
-            android:defaultValue="Default value" />
+            android:defaultValue="Default value" /-->
 
         <android.support.v7.preference.EditTextPreference
             android:key="keyy3"
             android:title="Email Id"
             android:summary="Set Email Id"
             android:dialogMessage="Dialog Message"
-            android:defaultValue="Default value" />
+            android:defaultValue="Default value"
+            android:enabled="false"/>
 
     </android.support.v7.preference.PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>

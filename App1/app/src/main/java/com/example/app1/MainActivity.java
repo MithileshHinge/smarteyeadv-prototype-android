@@ -1,6 +1,7 @@
 package com.example.app1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -27,7 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     //Defining Variables
     public static Toolbar toolbar;
@@ -165,6 +166,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*power_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                SharedPreferences loggedIn = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                loggedIn.edit().putBoolean("auto_login",false).apply();
+                Toast.makeText(v.getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                //startActivityForResult(intent,);
+                //intent.setAction(Intent.ACTION_VIEW);
+            }
+        });*/
+
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
@@ -201,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -276,5 +292,13 @@ public class MainActivity extends AppCompatActivity {
         }else{
             super.onBackPressed();
         }
+    }
+
+    public void logoutClicked(View view) {
+        SharedPreferences loggedIn = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        loggedIn.edit().putBoolean("auto_login",false).apply();
+        Toast.makeText(view.getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
     }
 }

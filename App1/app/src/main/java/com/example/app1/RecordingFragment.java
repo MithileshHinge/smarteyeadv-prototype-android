@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -46,6 +45,7 @@ public class RecordingFragment extends Fragment {
                         bookmarkedDatabaseRow = new BookmarkedDatabaseRow();
                         bookmarkedDatabaseRow.setUrl(fileEntry.getPath());
                         bookmarkedDatabaseRow.setBkmrk(false);
+                        bookmarkedDatabaseRow.setStatus(false);
                         MainActivity.bookmarkedDatabaseHandler.addRow(bookmarkedDatabaseRow);
                         bookmarkedDatabaseRow = MainActivity.bookmarkedDatabaseHandler.getRowFromUrl(fileEntry.getPath());
                     }
