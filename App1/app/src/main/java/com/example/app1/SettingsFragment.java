@@ -1,6 +1,5 @@
 package com.example.app1;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,12 +10,12 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static int i = 1;
     public boolean switched;
+    TextView username;
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         getActivity().setTitle("Settings");
@@ -62,14 +61,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (p3 instanceof EditTextPreference) {
             SharedPreferences spref_user = PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor edit2 = spref_user.edit();
-            EditTextPreference editTextPref = (EditTextPreference) p3;
             if (p3.getTitle().toString().toLowerCase().contains("Username")) {
-                p3.setSummary("******");
+                p3.setSummary(spref_user.getString("username",""));
             } else {
-                p3.setSummary(editTextPref.getText());
-                edit2.putString("username",editTextPref.getText());
-                edit2.commit();
+                p3.setSummary(spref_user.getString("username",""));
             }
         }
 
@@ -88,14 +83,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (p5 instanceof EditTextPreference) {
             SharedPreferences spref_email = PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor edit3 = spref_email.edit();
-            EditTextPreference editTextPref = (EditTextPreference) p5;
             if (p5.getTitle().toString().toLowerCase().contains("Email Id")) {
-                p5.setSummary("******");
+                p5.setSummary(spref_email.getString("email_id",""));
             } else {
-                p5.setSummary(editTextPref.getText());
-                edit3.putString("email_id",editTextPref.getText());
-                edit3.commit();
+                p5.setSummary(spref_email.getString("email_id",""));
             }
         }
 
@@ -150,7 +141,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
             }
         }
-        if(key.equals("keyy1")) {
+        /*if(key.equals("keyy1")) {
+            System.out.println("...............username input");
             Preference p3 = getPreferenceScreen().findPreference("keyy1");
             SharedPreferences spref_user = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor edit2 = spref_user.edit();
@@ -195,7 +187,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
             }
 
-        }
+        }*/
 
         if(key.equals("key1")) {
             Preference p6 = getPreferenceScreen().findPreference("key1");
