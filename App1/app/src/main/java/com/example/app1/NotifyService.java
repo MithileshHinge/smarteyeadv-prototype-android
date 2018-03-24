@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -168,7 +170,7 @@ public class NotifyService extends Service {
                             socketFrame.close();
 
                             imageName = getCurrentTimeStamp();
-                            saveImage(context, notifFrame, imageName);
+                            saveImage(notifFrame, imageName);
 
                             firstNotifIntent.putExtra("image_name", imageName);
 
@@ -267,11 +269,13 @@ public class NotifyService extends Service {
         }
     }
 
-    public void saveImage(Context context, Bitmap b, String name){
-        name=name+".jpg";
+    public void saveImage( Bitmap b, String name){
+        final File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+        name=imageStorageDir.getPath() + "/" + name +".jpg";
         FileOutputStream out;
         try {
-            out = context.openFileOutput(name, Context.MODE_PRIVATE);
+            //out = context.openFileOutput(name, Context.MODE_PRIVATE);
+            out = new FileOutputStream(name);
             b.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.close();
         } catch (Exception e) {
