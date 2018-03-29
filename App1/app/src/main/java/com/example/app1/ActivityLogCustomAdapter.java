@@ -131,9 +131,9 @@ public class ActivityLogCustomAdapter extends BaseExpandableListAdapter{
     }
 
     public Bitmap getImageBitmap(Context context, String name){
-        name=name+".jpg";
+
         try{
-            FileInputStream fis = context.openFileInput(name);
+            FileInputStream fis = new FileInputStream(name);
             Bitmap b = BitmapFactory.decodeStream(fis);
             fis.close();
             return b;

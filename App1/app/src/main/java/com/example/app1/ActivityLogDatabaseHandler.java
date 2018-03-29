@@ -74,6 +74,7 @@ public class ActivityLogDatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE, rowEntry.getDateTime());
         values.put(KEY_BKMRK, rowEntry.isBookmarked());
         values.put(KEY_THUMBPATH, rowEntry.getThumbpath());
+        System.out.println("DATABASE IMAGE NAME" + rowEntry.getThumbpath());
 
         // Inserting Row
         db.insert(TABLE_ACTIVITY_LOG, null, values);

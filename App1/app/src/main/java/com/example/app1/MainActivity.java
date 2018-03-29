@@ -175,9 +175,9 @@ public class MainActivity extends AppCompatActivity{
                         settingsFragmentTransaction.commit();
 
                         return true;
-                    case R.id.extras:
+                    /*case R.id.extras:
                         Toast.makeText(getApplicationContext(), "extras", Toast.LENGTH_SHORT).show();
-                        return true;
+                        return true;*/
                     default:
                         Toast.makeText(getApplicationContext(), "Somethings Wrong", Toast.LENGTH_SHORT).show();
                         return true;
