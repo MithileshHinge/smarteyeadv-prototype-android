@@ -3,6 +3,7 @@ package com.example.app1;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.SwitchPreference;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -10,11 +11,22 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static int i = 1;
     public boolean switched;
+    private static int msgPort = 6676;
+    private String servername;
+    public SharedPreferences spref_ip;
+    final byte BYTE_NORMAL_MODE = 3, BYTE_SURVELLIANCE_MODE = 1 ,BYTE_START_EMAIL = 9 ,BYTE_STOP_EMAIL = 10;
+
     TextView username;
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -22,7 +34,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         // Load the Preferences from the XML file
         addPreferencesFromResource(R.xml.settings_preferences);
-
 
         Preference p = getPreferenceScreen().findPreference("key2");
 
@@ -35,7 +46,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             } else {
                 p.setSummary(editTextPref.getText());
                 if(i == 1){
-                    edit1.putString("ip_address", "192.168.1.105");
+                    edit1.putString("ip_address", "192.168.43.181");
 
                 }else {
                     edit1.putString("ip_address", editTextPref.getText());
@@ -49,7 +60,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if(p2 instanceof ListPreference){
             ListPreference listPref = (ListPreference) p2;
             if(i == 1){
-                ((ListPreference) p2).setValueIndex(1);
+                ((ListPreference) p2).setValueIndex(0);
                 i++;
             }
             p2.setSummary(listPref.getEntry());
@@ -91,8 +102,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
 
 
-
-
     }
     @Override
     public void onResume() {
@@ -116,10 +125,30 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if (pref instanceof ListPreference) {
             SharedPreferences spref_mode = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor edit = spref_mode.edit();
-            ListPreference listPref = (ListPreference) pref;
+            final ListPreference listPref = (ListPreference) pref;
             pref.setSummary(listPref.getEntry());
             edit.putString("mode_type",listPref.getEntry().toString());
             edit.commit();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        spref_ip = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        servername = spref_ip.getString("ip_address", "");
+                        //System.out.println("Servername received    "+ servername);
+                        Socket socket = new Socket(servername, msgPort);
+                        OutputStream out = socket.getOutputStream();
+                        InputStream in = socket.getInputStream();
+                        if(listPref.getEntry().toString().equals("Normal Mode")) {
+                            out.write(BYTE_NORMAL_MODE);
+                        } else out.write(BYTE_SURVELLIANCE_MODE);
+                        in.read();
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
         if (pref instanceof EditTextPreference) {
             SharedPreferences spref_ip = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -206,6 +235,45 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     intent.putExtra("RQS", NotifyService.RQS_STOP_SERVICE);
                     getActivity().sendBroadcast(intent);
                 }
+            }
+
+        }
+
+        if(key.equals("key5")){
+            Preference p7 = getPreferenceScreen().findPreference("key5");
+
+            if(p7 instanceof SwitchPreferenceCompat){
+
+                SwitchPreferenceCompat switchPreferenceCompat = (SwitchPreferenceCompat) p7;
+                switched = (switchPreferenceCompat).isChecked();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            spref_ip = PreferenceManager.getDefaultSharedPreferences(getContext());
+                            servername = spref_ip.getString("ip_address", "");
+                            System.out.println("Servername received    "+ servername);
+                            Socket socket = new Socket(servername, msgPort);
+                            OutputStream out = socket.getOutputStream();
+                            InputStream in = socket.getInputStream();
+                            if(switched){
+                                out.write(BYTE_START_EMAIL);
+                                //Toast.makeText(getContext(),"Email Notification On" , Toast.LENGTH_SHORT).show();
+                            }else{
+                                out.write(BYTE_STOP_EMAIL);
+                                //Toast.makeText(getContext(),"Email Notification Off" , Toast.LENGTH_SHORT).show();
+                            }
+                            in.read();
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                if(switched)
+                    Toast.makeText(getContext(),"Email Notification On" , Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(),"Email Notification Off", Toast.LENGTH_SHORT).show();
             }
 
         }

@@ -37,11 +37,11 @@
             android:checked="false"
             android:icon="@drawable/ic_build_black_24px"
             android:title="@string/settings_string" />
-        <item
+        <!--item
             android:id="@+id/extras"
             android:checked="false"
             android:icon="@drawable/ic_wallpaper_black_24px"
-            android:title="@string/extras_string" />
+            android:title="@string/extras_string" /-->
 
     </group>
 </menu>

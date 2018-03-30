@@ -32,7 +32,7 @@ public class ActivityLogFragment extends Fragment {
 
         NotifyService.db = new ActivityLogDatabaseHandler(getActivity());
 
-        datenow = ActivityLogDatabaseRow.dateFormat.format(new Date());
+        //datenow = ActivityLogDatabaseRow.dateFormat.format(new Date());
         //db.addRow(new ActivityLogDatabaseRow("Ravi", datenow, 0));
 
 

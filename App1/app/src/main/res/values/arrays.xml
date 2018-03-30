@@ -3,8 +3,8 @@
     <string-array name="listentries">
         <item>Surveillance Mode</item>
         <item>Normal Mode</item>
-        <item>Extra 1</item>
-        <item>Extra 2</item>
+        <!--item>Extra 1</item>
+        <item>Extra 2</item-->
     </string-array>
     <string-array name="listvalues">
         <item>1</item>

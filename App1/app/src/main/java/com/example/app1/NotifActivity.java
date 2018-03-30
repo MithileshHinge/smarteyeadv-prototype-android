@@ -7,10 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
@@ -111,9 +109,11 @@ public class NotifActivity extends AppCompatActivity {
                                 final String finalVideoFileName = videoStorageDir.getPath() + "/" + filename;
                                 System.out.println("*****************folder path = " + finalVideoFileName);
                                 FileOutputStream fileOut = new FileOutputStream(finalVideoFileName);
-                                */
                                 FileOutputStream fileOut = openFileOutput(filename, MODE_PRIVATE);   ///////newly added...delete it agar externalstorage used
-
+                                */
+                                final File vdoDirectory = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyeVideos");
+                                final String filepath = vdoDirectory.getPath() + "/" + filename;
+                                FileOutputStream fileOut = new FileOutputStream(filepath);
                                 byte[] buffer = new byte[16 * 1024];
                                 int count;
                                 runOnUiThread(new Runnable() {
@@ -133,12 +133,12 @@ public class NotifActivity extends AppCompatActivity {
                                     public void run() {
                                         Toast.makeText(context, "Download successful.", Toast.LENGTH_LONG).show();
                                         jIV.setVisibility(View.GONE);
-                                       /*#### String filepath = videoStorageDir.getAbsolutePath() + "/" + filename;
+                                        /*#### String filepath = videoStorageDir.getAbsolutePath() + "/" + filename;
                                         System.out.println("^^^^^^^^^^^^^^^^folder path = " + videoStorageDir.getAbsolutePath() + "/" + filename);
                                         jVV.setVideoPath(finalVideoFileName);*/
                                         ////newly added block..delete if using external storage
-                                        String filepath = getFilesDir().getPath() + "/" + filename;
-                                        System.out.println("^^^^^^^^^^^^^^^^folder path = " + getFilesDir().getPath() + "/" + filename);
+                                        //String filepath = getFilesDir().getPath() + "/" + filename;
+                                        //System.out.println("^^^^^^^^^^^^^^^^folder path = " + getFilesDir().getPath() + "/" + filename);
                                         jVV.setVideoPath(filepath);
                                         //block ends
 

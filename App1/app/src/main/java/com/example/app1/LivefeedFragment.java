@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -33,7 +32,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -47,19 +45,25 @@ public class LivefeedFragment extends Fragment {
     public static Bitmap frame = null;
     private static Client t;
 
+    private static Listen listenThread;
+
     public byte[] buffer;
     public static int p;
     public static DatagramSocket AudioSocket;
     private int AudioPort = 6671;
+
     AudioRecord recorder;
     private int sampleRate = 44100;
     private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     int minBufSize;
     private boolean status = false;
-    private String servername;
+    public static String servername;
     private Socket handshake_socket;
     private static SharedPreferences spref_ip;
+
+    private static int msgPort = 6676;
+    final byte BYTE_STOP_ALARM = 8, BYTE_START_ALARM = 7;
 
     @Nullable
     @Override
@@ -69,7 +73,8 @@ public class LivefeedFragment extends Fragment {
         img = (ImageView) v.findViewById(R.id.imageView);
         Button photo_button = (Button)  v.findViewById(R.id.push_button);
         ToggleButton Voice_button = (ToggleButton) v.findViewById(R.id.Voice_button);
-        ToggleButton Record_button = (ToggleButton) v.findViewById(R.id.record_button);
+        ToggleButton Listen_button = (ToggleButton) v.findViewById(R.id.Speaker_button);
+        ToggleButton Alarm_button = (ToggleButton) v.findViewById(R.id.Alarm_button);
 
         spref_ip = PreferenceManager.getDefaultSharedPreferences(getContext());
         servername = spref_ip.getString("ip_address","");
@@ -163,6 +168,7 @@ public class LivefeedFragment extends Fragment {
                         recorder.release();
                         AudioSocket.close();
                         try {
+                            if(handshake_socket != null)
                             handshake_socket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -171,6 +177,43 @@ public class LivefeedFragment extends Fragment {
                 }
             }
         });
+        Listen_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    System.out.println(".................LISTEN BUTTON PRESSED............");
+
+                    listenThread = new Listen();
+                    listenThread.start();
+                }else{
+                    listenThread.listen_status = false;
+                    System.out.println("listen status = "+ listenThread.listen_status);
+                }
+            }
+        });
+
+        Alarm_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, final boolean isChecked) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(isChecked){
+                            while (!LivefeedFragment.sendMsg(BYTE_START_ALARM)){}
+                            System.out.println(".................ALARM BUTTON PRESSED............");
+                        }else{
+                            while (!LivefeedFragment.sendMsg(BYTE_STOP_ALARM)){}
+                            System.out.println("....alarm off");
+                        }
+                    }
+                }).start();
+            }
+        });
+
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
+
         return v;
     }
 
@@ -244,7 +287,34 @@ public class LivefeedFragment extends Fragment {
                 }
             }
         }
+        if(listenThread != null) {
+            if (listenThread.listen_status) {
+                listenThread.listen_status = false;
+            }
+        }
         super.onPause();
+    }
+
+    public static boolean sendMsg(int p){
+        Socket msgSocket;
+        try {
+            msgSocket = new Socket(LivefeedFragment.servername, msgPort);
+            OutputStream out =  msgSocket.getOutputStream();
+            InputStream in = msgSocket.getInputStream();
+            out.write(p);
+            out.flush();
+            in.read();
+
+            try{
+                msgSocket.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

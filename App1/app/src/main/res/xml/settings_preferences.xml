@@ -33,11 +33,11 @@
             android:summary="Control Email Service"
             android:defaultValue="false" />
 
-        <android.support.v7.preference.CheckBoxPreference
+        <!--android.support.v7.preference.CheckBoxPreference
             android:key="key3"
             android:title="CheckBox Preference"
             android:summary="CheckBox Summary"
-            android:defaultValue="true"/>
+            android:defaultValue="true"/-->
 
 
     </android.support.v7.preference.PreferenceCategory>

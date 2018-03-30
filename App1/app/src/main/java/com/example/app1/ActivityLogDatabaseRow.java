@@ -1,6 +1,9 @@
 package com.example.app1;
 
 
+import android.os.Environment;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -15,7 +18,7 @@ public class ActivityLogDatabaseRow {
     int _isBookmarked;
     String _thumbpath;
 
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
 
     // Empty constructor
     public ActivityLogDatabaseRow(){
@@ -80,10 +83,15 @@ public class ActivityLogDatabaseRow {
     }
 
     public String getThumbpath(){
+        final File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+        //_thumbpath = imageStorageDir.getPath() + "/" + _thumbpath;
+        //System.out.println("DATABASE ROW THUMBPATH" + _thumbpath);
         return _thumbpath;
+
     }
 
     public void setThumbpath(String thumbpath){
         _thumbpath = thumbpath;
+
     }
 }

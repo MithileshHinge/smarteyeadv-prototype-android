@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Sibhali on 12/19/2016.
@@ -36,7 +39,7 @@ public class NotifyService extends Service {
     final static String ACTION = "NotifyServiceAction";
     final static String STOP_SERVICE = "";
     final static int RQS_STOP_SERVICE = 1;
-    public static final byte BYTE_PEOPLE_VDOGENERATING = 1, BYTE_PEOPLE_VDOGENERATED = 2, BYTE_ALERT1 = 3, BYTE_ALERT2 = 4, BYTE_ABRUPT_END = 5;
+    public static final byte BYTE_PEOPLE_VDOGENERATING = 1, BYTE_PEOPLE_VDOGENERATED = 2, BYTE_ALERT1 = 3, BYTE_ALERT2 = 4, BYTE_ABRUPT_END = 5, BYTE_LIGHT = 6;
 
     NotifyServiceReceiver notifyServiceReceiver;
 
@@ -95,6 +98,7 @@ public class NotifyService extends Service {
             @Override
             public void run() {
                 String imageName = null;
+                String database_thumbpath = null;
 
                 while(true) {
                     int nPersons = 0, nFaces = 0;
@@ -119,22 +123,18 @@ public class NotifyService extends Service {
                         firstNotifIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         secondNotifIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        if(p==BYTE_ALERT1)
-                        {
+                        if(p==BYTE_ALERT1) {
                             notifBuilder.setContentTitle("Suspicious activity.");
                         }
-                        if(p == BYTE_PEOPLE_VDOGENERATED)
-                        {
+                        /*if(p == BYTE_PEOPLE_VDOGENERATED) {
                             _name = "Face Found.";
-
-
-                        }
-                        if(p == BYTE_ALERT2)
-                        {
+                        }*/
+                        if(p == BYTE_ALERT2) {
                             notifVdoBuilder.setContentTitle("Suspicious activity. Video generated");
-                            _name = "Suspicious activity.Alert level 2";
+                            _name = "Suspicious activity. Alert level 2";
                         }
                         if( p == BYTE_ABRUPT_END){
+                            notifVdoBuilder.setContentTitle("Abrupt end of activity.");
                             _name = "Abrupt end of activity.";
                         }
 
@@ -150,12 +150,14 @@ public class NotifyService extends Service {
                                     notifBuilder.setContentTitle("Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
                                     notifVdoBuilder.setContentTitle(nPersons + " people on your doorstep.");
+                                    _name = nPersons + " people on your doorstep";
                                 }
                             }else {
                                 if (p == BYTE_PEOPLE_VDOGENERATING){
                                     notifBuilder.setContentTitle("Someone is on your doorstep.");
                                 }else if (p == BYTE_PEOPLE_VDOGENERATED){
-                                    notifVdoBuilder.setContentTitle(nPersons + " people with " + (nPersons - nFaces) + " faces covered on your doorstep.");
+                                    notifVdoBuilder.setContentTitle(nPersons + " people with " + (nPersons - nFaces) + " faces covered");
+                                    _name = nPersons + " people with " + (nPersons - nFaces) + " faces covered";
                                 }
                             }
                         }
@@ -168,7 +170,8 @@ public class NotifyService extends Service {
                             socketFrame.close();
 
                             imageName = getCurrentTimeStamp();
-                            saveImage(context, notifFrame, imageName);
+                            database_thumbpath = saveImage(notifFrame, imageName);
+                            System.out.println("NOTIF IMAGE NAME" + imageName);
 
                             firstNotifIntent.putExtra("image_name", imageName);
 
@@ -192,7 +195,9 @@ public class NotifyService extends Service {
                         if(p== BYTE_PEOPLE_VDOGENERATED || p ==BYTE_ALERT2 || p == BYTE_ABRUPT_END){
                             DataInputStream dataInputStream = new DataInputStream(in);
                             String _date = dataInputStream.readUTF();
-                            db.addRow(new ActivityLogDatabaseRow(_name, _date, 0, imageName));
+                            System.out.println("SECOND NOTIF DATE" + _date);
+                            db.addRow(new ActivityLogDatabaseRow(_name, _date, 0, database_thumbpath));
+                            //System.out.println("ACTIVITY IMAGE NAME" + database_thumbpath);
 
                         }
                         DataInputStream din = new DataInputStream(in);
@@ -203,8 +208,7 @@ public class NotifyService extends Service {
                         din.close();
                         client.close();
 
-                        if(p == BYTE_PEOPLE_VDOGENERATING || p == BYTE_ALERT1)
-                        {
+                        if(p == BYTE_PEOPLE_VDOGENERATING || p == BYTE_ALERT1) {
                             notificationManager.notify(MY_NOTIFICATION_ID, notifBuilder.build());
 
                         }
@@ -222,10 +226,12 @@ public class NotifyService extends Service {
                             System.out.println("NOTIF 2nd GIVEN");
 
                         }
-                        if(p == 6){
+                        if(p == BYTE_LIGHT){
                             notificationManager.notify(MY_NOTIFICATION_ID,lightBuilder.build());
                             _name = lightTitle;
-                            String datenow = ActivityLogDatabaseRow.dateFormat.format(new Date());
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd'at'HH_mm_ss_a");
+                            String datenow = dateFormat.format(new Date());
+                            System.out.println("LIGHT DATE" + datenow);
                             db.addRow(new ActivityLogDatabaseRow(_name, datenow, 0, null));
                         }
 
@@ -267,20 +273,23 @@ public class NotifyService extends Service {
         }
     }
 
-    public void saveImage(Context context, Bitmap b, String name){
-        name=name+".jpg";
+    public static String saveImage( Bitmap b, String name){
+        final File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+        name=imageStorageDir.getPath() + "/" + name +".jpg";
         FileOutputStream out;
         try {
-            out = context.openFileOutput(name, Context.MODE_PRIVATE);
+            //out = context.openFileOutput(name, Context.MODE_PRIVATE);
+            out = new FileOutputStream(name);
             b.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return name;
     }
 
     public static String getCurrentTimeStamp() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());//dd/MM/yyyy
         Date now = new Date();
         String strDate = sdfDate.format(now);
         return strDate;

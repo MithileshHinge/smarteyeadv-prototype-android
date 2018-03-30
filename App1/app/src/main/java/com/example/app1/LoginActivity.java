@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     public static SharedPreferences spref_user,spref_email;
     private static SharedPreferences loggedIn;
 
-    @InjectView(R.id.input_email) EditText _emailText;
+    //@InjectView(R.id.input_email) EditText _emailText;
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_login) Button _loginButton;
     @InjectView(R.id.input_username) EditText _usernameText;
@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             _loginButton.setEnabled(true);
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivityForResult(intent, REQUEST_SIGNUP);
+            finish();
         }
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
-        email = _emailText.getText().toString();
+        email = "sibhalihastey@gmail.com";
         password = _passwordText.getText().toString();
         username = _usernameText.getText().toString();
         spref_user = PreferenceManager.getDefaultSharedPreferences(this);
@@ -112,7 +113,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // disable going back to the MainActivity
-        moveTaskToBack(true);
+        //moveTaskToBack(true);
+        super.onBackPressed();
     }
 
     public void onLoginSuccess() {
@@ -126,22 +128,29 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
         _loginButton.setEnabled(true);
     }
 
     public boolean validate() {
         boolean valid = true;
 
-        String email = _emailText.getText().toString();
+        String username = _usernameText.getText().toString();
+        //String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if(username.isEmpty() || username.length() < 4 || username.length() > 10){
+            _usernameText.setError("between 4 and 10 alphabets");
+            valid = false;
+        } else {
+            _usernameText.setError(null);
+        }
+
+        /*if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _emailText.setError("enter a valid email address");
             valid = false;
         } else {
             _emailText.setError(null);
-        }
+        }*/
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
             _passwordText.setError("between 4 and 10 alphanumeric characters");

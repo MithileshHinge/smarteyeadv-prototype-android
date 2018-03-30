@@ -3,14 +3,11 @@ package com.example.app1;
 /**
  * Created by Home on 10-07-2017.
  */
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.support.v7.preference.PreferenceManager;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
@@ -22,6 +19,7 @@ public class Client extends Thread {
     private int udpPort = 6663;
     private int port = 6666;
     private boolean livefeed = true;
+    final byte BYTE_STOP_LIVEFEED = 4;
     //private InputStream in;
     //private OutputStream out;
     private static SharedPreferences spref_ip;
@@ -54,9 +52,10 @@ public class Client extends Thread {
                 //socket.close();
                 udpSocket.close();
                 if (!livefeed) {
-                    socket.close();
+                    while (!LivefeedFragment.sendMsg(BYTE_STOP_LIVEFEED)){}
                     System.out.println("CLIENT BANDA JHALA");
                     livefeed = true;
+                    socket.close();
                     return;
                 }
             }
@@ -72,9 +71,6 @@ public class Client extends Thread {
         }
     }
 
-    public void end(){
-
-        livefeed = false;
-    }
+    public void end(){ livefeed = false; }
 }
 

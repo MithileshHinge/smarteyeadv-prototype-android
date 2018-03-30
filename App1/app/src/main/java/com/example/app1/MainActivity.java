@@ -1,13 +1,18 @@
 package com.example.app1;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -43,6 +48,9 @@ public class MainActivity extends AppCompatActivity{
     public static Context context;
     public static SharedPreferences spref_mode,spref_user;
     public static BookmarkedDatabaseHandler bookmarkedDatabaseHandler;
+    private static String  TAG = "Permsission : ";
+    private static boolean write_permission;
+    public static File imageStorageDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +73,17 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.parseColor("#F7E7CE"));
 
+        write_permission  = isStoragePermissionGranted() ;
+        System.out.println("write permission status is: " + write_permission);
+        if(write_permission) {
+            //Creating Magic Eye Directory in Internal Storage
+            final File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MagicEye");
+            if (!mediaStorageDir.exists()) {
+                if (!mediaStorageDir.mkdirs()) {
+                    Log.d("App", "failed to create media directory");
+                }
+            }
+        }
         //Creating Magic Eye Directory in Internal Storage
         final File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MagicEye");
         if (!mediaStorageDir.exists()) {
@@ -78,7 +97,9 @@ public class MainActivity extends AppCompatActivity{
                 Log.d("App", "failed to create video directory");
             }
         }
-        final File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+        imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+        System.out.println(imageStorageDir.getPath().toString());
+        System.out.println(Environment.getExternalStorageDirectory());
         if (!imageStorageDir.exists()) {
             if (!imageStorageDir.mkdirs()) {
                 Log.d("App", "failed to create picture directory");
@@ -154,9 +175,9 @@ public class MainActivity extends AppCompatActivity{
                         settingsFragmentTransaction.commit();
 
                         return true;
-                    case R.id.extras:
+                    /*case R.id.extras:
                         Toast.makeText(getApplicationContext(), "extras", Toast.LENGTH_SHORT).show();
-                        return true;
+                        return true;*/
                     default:
                         Toast.makeText(getApplicationContext(), "Somethings Wrong", Toast.LENGTH_SHORT).show();
                         return true;
@@ -280,17 +301,79 @@ public class MainActivity extends AppCompatActivity{
         client.disconnect();
     }
 
-    @Override
+    boolean doubleBackToExitPressedOnce = false;
+
     public void onBackPressed(){
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment current = fragmentManager.findFragmentByTag("ACTIVITY");
         if(current == null){
-            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             ActivityLogFragment activityLogFragment = new ActivityLogFragment();
-            fragmentTransaction.replace(R.id.frame, activityLogFragment);
-            fragmentTransaction.commit();
+            android.support.v4.app.FragmentTransaction activityFragmentTransaction = getSupportFragmentManager().beginTransaction();
+            activityFragmentTransaction.replace(R.id.frame, activityLogFragment,"ACTIVITY");
+            activityFragmentTransaction.commit();
         }else{
-            super.onBackPressed();
+            if (doubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce=false;
+                }
+            }, 2000);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+            //resume tasks needing this permission
+            System.out.println("waiting to create folders");
+            //Creating Magic Eye Directory in Internal Storage
+            final File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MagicEye");
+            if (!mediaStorageDir.exists()) {
+                if (!mediaStorageDir.mkdirs()) {
+                    Log.d("App", "failed to create media directory");
+                }
+            }
+            final File videoStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyeVideos");
+            if (!videoStorageDir.exists()) {
+                if (!videoStorageDir.mkdirs()) {
+                    Log.d("App", "failed to create video directory");
+                }
+            }
+            final File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory("MagicEye"), "MagicEyePictures");
+            if (!imageStorageDir.exists()) {
+                if (!imageStorageDir.mkdirs()) {
+                    Log.d("App", "failed to create picture directory");
+                }
+            }
+        }
+    }
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG, "Permission is granted");
+                return true;
+
+            } else {
+
+                Log.v(TAG, "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG, "Permission is granted");
+            return true;
         }
     }
 
